@@ -586,18 +586,16 @@ class Taquin:
         
         return manhattan + conflits
     
-    def calculer_heuristique_combinee(self, etat: Etat, poids_manhattan=1.0, poids_mal_places=0.5, poids_lineaire=1.5) -> float:
+    def calculer_heuristique_combinee(self, etat: Etat) -> float:
         """
-        Combine plusieurs heuristiques avec différents poids.
+        Calcule l'heuristique combinée qui combine la distance de Manhattan
+        avec une pénalité pour les caractères qui ne suivent pas l'ordre séquentiel.
         
         Args:
             etat: État pour lequel calculer l'heuristique
-            poids_manhattan: Poids de la distance de Manhattan
-            poids_mal_places: Poids du nombre de cases mal placées
-            poids_lineaire: Poids de l'heuristique avec conflits linéaires
             
         Returns:
-            float: Valeur combinée des heuristiques
+            float: Valeur de l'heuristique combinée
         """
         if self.etat_final is None:
             return 0
@@ -606,9 +604,7 @@ class Taquin:
         mal_places = self.calculer_cases_mal_placees(etat)
         lineaire = self.calculer_heuristique_lineaire(etat)
         
-        return (poids_manhattan * manhattan + 
-                poids_mal_places * mal_places + 
-                poids_lineaire * lineaire)
+        return (manhattan + 3 * mal_places + lineaire)
     
     def calculer_heuristique_pattern_database(self, etat: Etat) -> int:
         """
@@ -848,7 +844,7 @@ def resolution_bfs(taquin: Taquin, limite_noeuds=100000, limite_temps=30) -> Opt
 
 
 def resolution_best_first(taquin: Taquin, limite_noeuds=100000, limite_temps=30, 
-                          heuristique='manhattan') -> Optional[List[Tuple[str, Etat]]]:
+                          heuristique='combinee') -> Optional[List[Tuple[str, Etat]]]:
     """
     Résout le Taquin par parcours meilleur d'abord (Best-First Search).
     
@@ -856,8 +852,7 @@ def resolution_best_first(taquin: Taquin, limite_noeuds=100000, limite_temps=30,
         taquin: Instance du jeu de Taquin
         limite_noeuds: Nombre maximal de nœuds à explorer
         limite_temps: Limite de temps en secondes
-        heuristique: Heuristique à utiliser ('manhattan', 'mal_places', 'euclidienne', 'nilsson', 
-                     'lineaire', 'combinee', 'pattern')
+        heuristique: Heuristique à utiliser ('lineaire' ou 'combinee')
         
     Returns:
         Chemin de résolution ou None si pas de solution trouvée
@@ -872,23 +867,13 @@ def resolution_best_first(taquin: Taquin, limite_noeuds=100000, limite_temps=30,
         
     # Sélectionner l'heuristique appropriée
     heuristique_func = None
-    if heuristique == 'manhattan':
-        heuristique_func = taquin.calculer_distance_manhattan
-    elif heuristique == 'mal_places':
-        heuristique_func = taquin.calculer_cases_mal_placees
-    elif heuristique == 'euclidienne':
-        heuristique_func = taquin.calculer_distance_euclidienne
-    elif heuristique == 'nilsson':
-        heuristique_func = taquin.calculer_heuristique_nilsson
-    elif heuristique == 'lineaire':
+    if heuristique == 'lineaire':
         heuristique_func = taquin.calculer_heuristique_lineaire
     elif heuristique == 'combinee':
         heuristique_func = taquin.calculer_heuristique_combinee
-    elif heuristique == 'pattern':
-        heuristique_func = taquin.calculer_heuristique_pattern_database
     else:
-        print(f"Heuristique '{heuristique}' non reconnue. Utilisation de Manhattan par défaut.")
-        heuristique_func = taquin.calculer_distance_manhattan
+        print(f"Heuristique '{heuristique}' non reconnue. Utilisation de l'heuristique combinée par défaut.")
+        heuristique_func = taquin.calculer_heuristique_combinee
         
     # Initialisation
     debut_temps = time.time()
@@ -946,7 +931,7 @@ def resolution_best_first(taquin: Taquin, limite_noeuds=100000, limite_temps=30,
 
 
 def resolution_a_star(taquin: Taquin, limite_noeuds=100000, limite_temps=30, 
-                    heuristique='manhattan') -> Optional[List[Tuple[str, Etat]]]:
+                    heuristique='combinee') -> Optional[List[Tuple[str, Etat]]]:
     """
     Résout le Taquin par algorithme A* (A-Star).
     Diffère du Best-First en ajoutant le coût du chemin parcouru à l'heuristique.
@@ -955,8 +940,7 @@ def resolution_a_star(taquin: Taquin, limite_noeuds=100000, limite_temps=30,
         taquin: Instance du jeu de Taquin
         limite_noeuds: Nombre maximal de nœuds à explorer
         limite_temps: Limite de temps en secondes
-        heuristique: Heuristique à utiliser ('manhattan', 'mal_places', 'euclidienne', 'nilsson', 
-                     'lineaire', 'combinee', 'pattern')
+        heuristique: Heuristique à utiliser ('lineaire' ou 'combinee')
         
     Returns:
         Chemin de résolution ou None si pas de solution trouvée
@@ -971,23 +955,13 @@ def resolution_a_star(taquin: Taquin, limite_noeuds=100000, limite_temps=30,
         
     # Sélectionner l'heuristique appropriée
     heuristique_func = None
-    if heuristique == 'manhattan':
-        heuristique_func = taquin.calculer_distance_manhattan
-    elif heuristique == 'mal_places':
-        heuristique_func = taquin.calculer_cases_mal_placees
-    elif heuristique == 'euclidienne':
-        heuristique_func = taquin.calculer_distance_euclidienne
-    elif heuristique == 'nilsson':
-        heuristique_func = taquin.calculer_heuristique_nilsson
-    elif heuristique == 'lineaire':
+    if heuristique == 'lineaire':
         heuristique_func = taquin.calculer_heuristique_lineaire
     elif heuristique == 'combinee':
         heuristique_func = taquin.calculer_heuristique_combinee
-    elif heuristique == 'pattern':
-        heuristique_func = taquin.calculer_heuristique_pattern_database
     else:
-        print(f"Heuristique '{heuristique}' non reconnue. Utilisation de Manhattan par défaut.")
-        heuristique_func = taquin.calculer_distance_manhattan
+        print(f"Heuristique '{heuristique}' non reconnue. Utilisation de l'heuristique combinée par défaut.")
+        heuristique_func = taquin.calculer_heuristique_combinee
         
     # Initialisation
     debut_temps = time.time()
@@ -1068,13 +1042,8 @@ def comparer_heuristiques(taquin: Taquin, limite_noeuds=10000, limite_temps=30) 
         Dict: Dictionnaire contenant les résultats pour chaque heuristique
     """
     heuristiques = [
-        'manhattan', 
-        'mal_places', 
-        'euclidienne', 
-        'nilsson', 
         'lineaire', 
-        'combinee', 
-        'pattern'
+        'combinee'
     ]
     
     resultats = {}
@@ -1383,9 +1352,9 @@ def main():
     )
     parser.add_argument(
         "--heuristique", "-u",
-        choices=["manhattan", "mal_places", "euclidienne", "nilsson", "lineaire", "combinee", "pattern"],
-        default="manhattan",
-        help="Heuristique à utiliser pour Best-First ou A* (par défaut: manhattan)"
+        choices=["lineaire", "combinee"],
+        default="combinee",
+        help="Heuristique à utiliser pour Best-First ou A* (par défaut: combinee)"
     )
     parser.add_argument(
         "--temps", "-t",

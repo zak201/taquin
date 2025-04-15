@@ -39,17 +39,13 @@ Quatre algorithmes de recherche sont disponibles pour résoudre le jeu de Taquin
 
 ## Heuristiques disponibles
 
-Pour les algorithmes Best-First et A*, sept heuristiques sont disponibles :
+Pour les algorithmes Best-First et A*, deux heuristiques sont disponibles, sélectionnées pour leur efficacité optimale :
 
-1. **manhattan** : Somme des distances horizontales et verticales entre chaque pièce et sa position finale.
-2. **mal_places** : Nombre de pièces qui ne sont pas à leur position finale.
-3. **euclidienne** : Somme des distances euclidiennes (en ligne droite) entre chaque pièce et sa position finale.
-4. **nilsson** : Amélioration de Manhattan avec des pénalités pour les séquences incorrectes.
-5. **lineaire** : Prend en compte les conflits linéaires en plus de la distance de Manhattan.
-6. **combinee** : Combinaison pondérée de plusieurs heuristiques.
-7. **pattern** : Se concentre sur certaines parties de la grille (comme les coins).
+1. **lineaire** : Prend en compte les conflits linéaires en plus de la distance de Manhattan, particulièrement efficace pour les grands puzzles.
 
-Selon les tests, l'heuristique **combinee** est généralement la plus efficace.
+2. **combinee** : Combine plusieurs métriques pour une estimation plus précise, généralement la plus performante pour la plupart des instances.
+
+Ces deux heuristiques ont été retenues après analyse comparative car elles offrent les meilleurs résultats en termes d'efficacité et de temps de calcul.
 
 ## Comment exécuter les algorithmes
 
@@ -63,20 +59,20 @@ python -m src.taquin_complet -i <instance> -a <algorithme> [-u <heuristique>] [-
 # Résoudre taquin_3x3b avec BFS
 python -m src.taquin_complet -i taquin_3x3b -a bfs
 
-# Résoudre taquin_4x4 avec A* et l'heuristique Manhattan
-python -m src.taquin_complet -i taquin_4x4 -a a-star -u manhattan
+# Résoudre taquin_4x4 avec A* et l'heuristique combinée
+python -m src.taquin_complet -i taquin_4x4 -a a-star -u combinee
 
 # Résoudre taquin_2x4b avec DFS avec une limite de 1000 nœuds
 python -m src.taquin_complet -i taquin_2x4b -a dfs -l 1000
 
-# Résoudre taquin_5x5b avec Best-First et l'heuristique combinée
-python -m src.taquin_complet -i taquin_5x5b -a best-first -u combinee
+# Résoudre taquin_5x5b avec Best-First et l'heuristique linéaire
+python -m src.taquin_complet -i taquin_5x5b -a best-first -u lineaire
 ```
 
 ### Comparer les heuristiques sur une instance
 
 ```bash
-# Compare toutes les heuristiques disponibles sur une instance
+# Compare les heuristiques linéaire et combinée sur une instance
 python -m src.taquin_complet -i <instance> -c
 
 # Exemple
@@ -124,7 +120,7 @@ Nos analyses montrent que :
    - D'autres sont beaucoup plus complexes (jusqu'à 17s de calcul)
    - Le nombre d'étapes varie de 18 à 166 selon l'instance
 
-5. **Meilleure heuristique** : L'heuristique combinée est généralement la plus performante, suivie des heuristiques linéaire et pattern.
+5. **Meilleure heuristique** : L'heuristique combinée est généralement la plus performante, suivie de l'heuristique linéaire.
 
 ### Tableau comparatif des algorithmes
 
@@ -137,14 +133,9 @@ Nos analyses montrent que :
 
 \* Si l'heuristique est admissible.
 
-### Tableau comparatif des heuristiques
+### Tableau comparatif des heuristiques retenues
 
 | Heuristique | Performance | Complexité de calcul | Commentaire |
 |-------------|-------------|----------------------|-------------|
-| manhattan   | Bonne       | Basse                | Bon rapport efficacité/simplicité |
-| mal_places  | Faible      | Très basse           | Souvent insuffisante pour instances difficiles |
-| euclidienne | Moyenne     | Moyenne              | Moins efficace que Manhattan pour le taquin |
-| nilsson     | Bonne       | Moyenne              | Amélioration de Manhattan |
 | lineaire    | Très bonne  | Haute                | Très efficace pour les grands puzzles |
-| combinee    | Excellente  | Haute                | Meilleure heuristique dans la plupart des cas |
-| pattern     | Très bonne  | Moyenne              | Efficace pour les puzzles complexes | 
+| combinee    | Excellente  | Haute                | Meilleure heuristique dans la plupart des cas | 

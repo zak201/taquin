@@ -72,7 +72,7 @@ def main():
     """
     Fonction principale.
     """
-    print("Analyse de toutes les instances disponibles...")
+    print("Analyse de toutes les instances disponibles avec A* et l'heuristique combinée...")
     print(f"Nombre total d'instances: {len(INSTANCES)}")
     
     # Analyser toutes les instances

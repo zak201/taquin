@@ -352,14 +352,9 @@ Ce rapport présente une analyse comparative des performances de différents alg
 - Parcours meilleur d'abord (Best-First Search)
 - Algorithme A* (A-Star)
 
-Différentes heuristiques ont également été testées pour les algorithmes Best-First et A*:
-- Distance de Manhattan
-- Nombre de cases mal placées
-- Distance euclidienne
-- Heuristique de Nilsson
-- Heuristique avec conflits linéaires
-- Heuristique combinée
-- Heuristique pattern database
+Deux heuristiques optimisées ont été testées pour les algorithmes Best-First et A*:
+- Heuristique linéaire (prise en compte des conflits linéaires)
+- Heuristique combinée (approche hybride optimisée)
 
 ## Instances testées
 
@@ -413,19 +408,9 @@ Pour chaque combinaison d'algorithme et d'heuristique, les métriques suivantes 
 
 ### Efficacité des heuristiques
 
-- **Distance de Manhattan**: Simple et efficace, elle calcule la somme des distances horizontales et verticales que chaque case doit parcourir pour atteindre sa position finale.
+- **Heuristique linéaire**: Améliore la distance de Manhattan en prenant en compte les conflits entre les cases dans une même ligne ou colonne, particulièrement efficace pour les grands puzzles.
   
-- **Nombre de cases mal placées**: Plus simple mais moins efficace que Manhattan, elle compte simplement les cases qui ne sont pas à leur place finale.
-  
-- **Distance euclidienne**: Alternative à Manhattan qui utilise la distance en ligne droite. Généralement moins efficace car moins informative pour ce problème.
-  
-- **Heuristique de Nilsson**: Améliore Manhattan en ajoutant une pénalité pour les séquences incorrectes.
-  
-- **Heuristique avec conflits linéaires**: Améliore Manhattan en prenant en compte les conflits entre les cases dans une même ligne ou colonne.
-  
-- **Heuristique combinée**: Fusion pondérée de plusieurs heuristiques pour tirer parti de leurs avantages respectifs.
-  
-- **Heuristique pattern database**: Se concentre sur certaines parties de la grille (comme les coins) qui peuvent être plus difficiles à résoudre.
+- **Heuristique combinée**: Fusion optimisée de plusieurs métriques, généralement la plus performante et efficace pour la plupart des instances.
 
 ### Compromis temps-mémoire
 
@@ -435,17 +420,15 @@ Les algorithmes informés (Best-First, A*) avec des heuristiques efficaces offre
 
 D'après les résultats obtenus, nous pouvons tirer les conclusions suivantes:
 
-1. L'algorithme A* avec l'heuristique pattern database offre généralement les meilleures performances en termes d'efficacité (rapport entre la longueur de la solution et le temps d'exécution).
+1. L'algorithme A* avec l'heuristique combinée offre généralement les meilleures performances en termes d'efficacité (rapport entre la longueur de la solution et le temps d'exécution).
 
 2. Le BFS garantit des solutions optimales mais peut échouer sur des instances complexes en raison de contraintes de mémoire.
 
 3. Le DFS peut trouver des solutions rapidement mais celles-ci sont souvent loin d'être optimales.
 
-4. Pour les instances les plus complexes, les heuristiques avancées (linéaire, pattern) font une différence significative en termes de temps d'exécution.
+4. Pour les instances les plus complexes, l'heuristique linéaire fait une différence significative en termes de temps d'exécution.
 
-5. L'heuristique du nombre de cases mal placées est généralement la moins efficace, tandis que Manhattan offre un bon rapport simplicité/efficacité.
-
-En résumé, le choix de l'algorithme et de l'heuristique dépend des contraintes spécifiques du problème: si l'optimalité est cruciale, A* avec une bonne heuristique est recommandé; si la mémoire est limitée, Best-First avec une heuristique efficace peut être préférable.
+En résumé, le choix de l'algorithme et de l'heuristique dépend des contraintes spécifiques du problème: si l'optimalité est cruciale, A* avec l'heuristique combinée est recommandé; si la mémoire est limitée, Best-First avec l'heuristique linéaire peut être préférable pour les grands puzzles.
 """
     
     # Écrire le rapport dans un fichier
@@ -474,15 +457,10 @@ def main():
         ("a-star", resolution_a_star)
     ]
     
-    # Définir les heuristiques à tester
+    # Définir les heuristiques à tester (uniquement les deux retenues)
     heuristiques = [
-        "manhattan",
-        "mal_places",
-        "euclidienne",
-        "nilsson",
         "lineaire",
-        "combinee",
-        "pattern"
+        "combinee"
     ]
     
     # Définir les limites
@@ -490,6 +468,8 @@ def main():
     limite_temps = 60  # 60 secondes maximum par test
     
     print("Début de l'analyse comparative des algorithmes et heuristiques")
+    print(f"Algorithmes testés: DFS, BFS, Best-First, A*")
+    print(f"Heuristiques testées: linéaire, combinée")
     print(f"Limite de nœuds: {limite_noeuds}, Limite de temps: {limite_temps}s")
     
     # Exécuter les tests comparatifs

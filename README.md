@@ -8,7 +8,7 @@ Une implémentation complète du jeu de Taquin en Python, avec plusieurs algorit
 
 - Implémentation unifiée dans un seul module (`taquin_complet.py`)
 - Quatre algorithmes de résolution : DFS, BFS, Best-First Search, A*
-- Sept heuristiques différentes pour les algorithmes informés
+- Deux heuristiques optimisées pour les algorithmes informés : linéaire et combinée
 - Analyse comparative des performances
 - 25 instances de test prédéfinies de différentes tailles (2x4, 3x3, 3x4, 4x4, 5x5)
 
@@ -34,12 +34,27 @@ pip install numpy tabulate matplotlib
 
 ## Utilisation rapide
 
-Pour résoudre une instance de taquin prédéfinie avec l'algorithme A* :
+Pour résoudre une instance avec l'algorithme BFS (recherche en largeur):
+```bash
+python -m src.taquin_complet -i taquin_3x3b -a bfs
+```
+
+Pour résoudre une instance avec l'algorithme DFS (recherche en profondeur):
+```bash
+python -m src.taquin_complet -i taquin_2x4b -a dfs
+```
+
+Pour résoudre une instance avec l'algorithme A* et l'heuristique combinée:
 ```bash
 python -m src.taquin_complet -i taquin_3x3b -a a-star -u combinee
 ```
 
-Pour comparer les performances des différentes heuristiques sur une instance :
+Pour résoudre une instance avec l'algorithme Best-First et l'heuristique linéaire:
+```bash
+python -m src.taquin_complet -i taquin_5x5b -a best-first -u lineaire
+```
+
+Pour comparer les performances des deux heuristiques sur une instance :
 ```bash
 python -m src.taquin_complet -i taquin_4x4 -c
 ```
