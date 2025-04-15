@@ -1,0 +1,50 @@
+{
+  "taquin_2x4d": {
+    "dfs": {
+      "succes": true,
+      "temps": 0.5778317451477051,
+      "longueur_solution": 50
+    },
+    "bfs": {
+      "succes": true,
+      "temps": 0.6287031173706055,
+      "longueur_solution": 24
+    }
+  },
+  "taquin_2x4c": {
+    "dfs": {
+      "succes": true,
+      "temps": 0.5719363689422607,
+      "longueur_solution": 47
+    },
+    "bfs": {
+      "succes": true,
+      "temps": 0.37174057960510254,
+      "longueur_solution": 21
+    }
+  },
+  "taquin_3x3b": {
+    "dfs": {
+      "succes": false,
+      "temps": 12.17917275428772,
+      "longueur_solution": null
+    },
+    "bfs": {
+      "succes": true,
+      "temps": 5.354240417480469,
+      "longueur_solution": 21
+    }
+  },
+  "taquin_2x4b": {
+    "dfs": {
+      "succes": true,
+      "temps": 0.5136067867279053,
+      "longueur_solution": 50
+    },
+    "bfs": {
+      "succes": true,
+      "temps": 0.3852388858795166,
+      "longueur_solution": 20
+    }
+  }
+}
