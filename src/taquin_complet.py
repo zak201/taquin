@@ -518,6 +518,9 @@ class Taquin:
         Un conflit linéaire se produit quand deux caractères dans leur ligne/colonne finale
         sont dans le désordre, nécessitant des déplacements supplémentaires.
         
+        Cette heuristique améliore la distance de Manhattan en ajoutant une pénalité
+        pour les caractères qui sont bien placés sur leur ligne/colonne mais dans le mauvais ordre.
+        
         Args:
             etat: État pour lequel calculer l'heuristique
             
@@ -527,13 +530,14 @@ class Taquin:
         if self.etat_final is None:
             return 0
             
-        # Calculer la distance de Manhattan de base
+        # Commencer par calculer la distance de Manhattan simple
         manhattan = self.calculer_distance_manhattan(etat)
         
         # Ajouter la pénalité pour les conflits linéaires
         conflits = 0
         
-        # Créer des dictionnaires pour accélérer la recherche
+        # Dictionnaire pour accélérer la recherche des positions finales
+        # Exemple: {'A': (0, 0), 'B': (0, 1), ...}
         positions_finales = {}
         for i in range(self.taille_x):
             for j in range(self.taille_y):
@@ -552,6 +556,8 @@ class Taquin:
                         dans_ligne_finale.append((j, caractere))
             
             # Vérifier les conflits parmi ces caractères
+            # Un conflit se produit quand deux caractères sont dans le bon ordre dans l'état final
+            # mais dans le mauvais ordre dans l'état actuel
             for idx1, (j1, car1) in enumerate(dans_ligne_finale):
                 for j2, car2 in dans_ligne_finale[idx1+1:]:
                     pos_finale1 = positions_finales[car1][1]
@@ -562,9 +568,8 @@ class Taquin:
                     elif pos_finale1 < pos_finale2 and j1 > j2:
                         conflits += 2
         
-        # Vérifier les conflits sur les colonnes
+        # Vérifier les conflits sur les colonnes (même logique que pour les lignes)
         for j in range(self.taille_y):
-            # Collecter les caractères de cette colonne qui sont déjà dans leur colonne finale
             dans_colonne_finale = []
             for i in range(self.taille_x):
                 caractere = etat.grille[i, j]
@@ -573,23 +578,25 @@ class Taquin:
                     if pos_finale[1] == j:  # Si le caractère est dans sa colonne finale
                         dans_colonne_finale.append((i, caractere))
             
-            # Vérifier les conflits parmi ces caractères
             for idx1, (i1, car1) in enumerate(dans_colonne_finale):
                 for i2, car2 in dans_colonne_finale[idx1+1:]:
                     pos_finale1 = positions_finales[car1][0]
                     pos_finale2 = positions_finales[car2][0]
-                    # Conflit si dans la même colonne et dans le désordre
                     if pos_finale1 > pos_finale2 and i1 < i2:
                         conflits += 2
                     elif pos_finale1 < pos_finale2 and i1 > i2:
                         conflits += 2
         
+        # La valeur finale est la distance de Manhattan plus les pénalités
         return manhattan + conflits
     
     def calculer_heuristique_combinee(self, etat: Etat) -> float:
         """
         Calcule l'heuristique combinée qui combine la distance de Manhattan
         avec une pénalité pour les caractères qui ne suivent pas l'ordre séquentiel.
+        
+        Cette heuristique est généralement la plus efficace car elle prend en compte
+        plusieurs facteurs importants pour résoudre le taquin.
         
         Args:
             etat: État pour lequel calculer l'heuristique
@@ -599,11 +606,16 @@ class Taquin:
         """
         if self.etat_final is None:
             return 0
-            
+        
+        # Calculer les différentes heuristiques individuelles
         manhattan = self.calculer_distance_manhattan(etat)
         mal_places = self.calculer_cases_mal_placees(etat)
         lineaire = self.calculer_heuristique_lineaire(etat)
         
+        # Combiner les heuristiques avec des poids appropriés
+        # La distance de Manhattan est la base, et on ajoute:
+        # - 3 fois le nombre de cases mal placées (pénalité forte)
+        # - La valeur de l'heuristique linéaire (déjà pondérée)
         return (manhattan + 3 * mal_places + lineaire)
     
     def calculer_heuristique_pattern_database(self, etat: Etat) -> int:
@@ -662,6 +674,9 @@ class Taquin:
 class NoeudRecherche:
     """
     Classe représentant un nœud dans l'arbre de recherche.
+    
+    Un nœud contient un état du jeu, une référence à son parent,
+    l'action qui a mené à cet état, et sa profondeur dans l'arbre.
     """
     def __init__(self, etat: Etat, parent=None, action=None, profondeur=0):
         """
@@ -688,12 +703,16 @@ class NoeudRecherche:
         """
         Reconstruit le chemin depuis la racine jusqu'à ce nœud.
         
+        Cette méthode parcourt l'arbre de recherche de ce nœud jusqu'à
+        la racine (en remontant les liens parents) et retourne le chemin complet.
+        
         Returns:
             Liste de tuples (action, état) représentant le chemin
         """
         chemin = []
         noeud_courant = self
         
+        # Remonter l'arbre jusqu'à la racine
         while noeud_courant.parent is not None:
             chemin.append((noeud_courant.action, noeud_courant.etat))
             noeud_courant = noeud_courant.parent
@@ -706,6 +725,9 @@ class NoeudRecherche:
 class NoeudPriorise(NoeudRecherche):
     """
     Nœud avec une priorité pour les algorithmes Best-First et A*.
+    
+    Cette classe étend NoeudRecherche en ajoutant une valeur de priorité
+    utilisée par les algorithmes informés pour déterminer l'ordre d'exploration.
     """
     def __init__(self, etat: Etat, parent=None, action=None, profondeur=0, priorite=0):
         super().__init__(etat, parent, action, profondeur)
@@ -714,6 +736,7 @@ class NoeudPriorise(NoeudRecherche):
     def __lt__(self, other):
         """
         Comparaison pour la file de priorité.
+        Les nœuds avec une priorité plus faible sont explorés en premier.
         """
         if not isinstance(other, NoeudPriorise):
             return NotImplemented
@@ -723,6 +746,10 @@ class NoeudPriorise(NoeudRecherche):
 def resolution_dfs(taquin: Taquin, limite_profondeur=100, limite_temps=30) -> Optional[List[Tuple[str, Etat]]]:
     """
     Résout le Taquin par parcours en profondeur (DFS).
+    
+    L'algorithme DFS explore l'arbre de recherche en profondeur d'abord.
+    Il n'est pas optimal (ne garantit pas la solution la plus courte)
+    mais peut être efficace en espace mémoire.
     
     Args:
         taquin: Instance du jeu de Taquin
@@ -747,7 +774,7 @@ def resolution_dfs(taquin: Taquin, limite_profondeur=100, limite_temps=30) -> Op
     nb_noeuds_explores = 0
     
     while pile and (time.time() - debut_temps) < limite_temps:
-        noeud_courant = pile.pop()
+        noeud_courant = pile.pop()  # Prendre le dernier nœud (LIFO - Last In, First Out)
         nb_noeuds_explores += 1
         
         # Vérifier si l'état est le but
@@ -762,14 +789,14 @@ def resolution_dfs(taquin: Taquin, limite_profondeur=100, limite_temps=30) -> Op
             
         etats_visites.add(etat_hash)
         
-        # Expanser le nœud
+        # Expanser le nœud si on n'a pas atteint la limite de profondeur
         if noeud_courant.profondeur < limite_profondeur:
             etats_voisins = taquin.obtenir_etats_voisins(noeud_courant.etat)
             
             # Les directions possibles
             directions = ['haut', 'bas', 'gauche', 'droite']
             
-            # Pour chaque direction possible
+            # Pour chaque direction possible, ajouter le nœud à la pile
             for i, voisin in enumerate(etats_voisins):
                 action = directions[i] if i < len(directions) else "inconnu"
                 pile.append(NoeudRecherche(
@@ -787,6 +814,10 @@ def resolution_dfs(taquin: Taquin, limite_profondeur=100, limite_temps=30) -> Op
 def resolution_bfs(taquin: Taquin, limite_noeuds=100000, limite_temps=30) -> Optional[List[Tuple[str, Etat]]]:
     """
     Résout le Taquin par parcours en largeur (BFS).
+    
+    L'algorithme BFS explore l'arbre de recherche niveau par niveau.
+    Il garantit de trouver la solution optimale (avec le moins d'étapes)
+    mais peut être coûteux en mémoire.
     
     Args:
         taquin: Instance du jeu de Taquin
@@ -806,7 +837,7 @@ def resolution_bfs(taquin: Taquin, limite_noeuds=100000, limite_temps=30) -> Opt
         
     # Initialisation
     debut_temps = time.time()
-    file = deque([NoeudRecherche(taquin.etat_initial)])
+    file = deque([NoeudRecherche(taquin.etat_initial)])  # File FIFO (First In, First Out)
     etats_visites = set([hash(taquin.etat_initial)])
     nb_noeuds_explores = 0
     
@@ -814,7 +845,7 @@ def resolution_bfs(taquin: Taquin, limite_noeuds=100000, limite_temps=30) -> Opt
     directions = ['haut', 'bas', 'gauche', 'droite']
     
     while file and nb_noeuds_explores < limite_noeuds and (time.time() - debut_temps) < limite_temps:
-        noeud_courant = file.popleft()
+        noeud_courant = file.popleft()  # Prendre le premier nœud (FIFO)
         nb_noeuds_explores += 1
         
         # Vérifier si l'état est le but
@@ -847,6 +878,10 @@ def resolution_best_first(taquin: Taquin, limite_noeuds=100000, limite_temps=30,
                           heuristique='combinee') -> Optional[List[Tuple[str, Etat]]]:
     """
     Résout le Taquin par parcours meilleur d'abord (Best-First Search).
+    
+    L'algorithme Best-First explore les nœuds selon une fonction heuristique
+    qui estime leur "proximité" à l'état but. Il n'est pas toujours optimal
+    mais explore généralement moins de nœuds que BFS.
     
     Args:
         taquin: Instance du jeu de Taquin
@@ -912,6 +947,7 @@ def resolution_best_first(taquin: Taquin, limite_noeuds=100000, limite_temps=30,
                 action = directions[i] if i < len(directions) else "inconnu"
                 
                 # Calculer la priorité en utilisant l'heuristique sélectionnée
+                # Dans Best-First, la priorité est simplement la valeur heuristique
                 priorite = heuristique_func(voisin)
                 compteur += 1
                 
@@ -934,7 +970,10 @@ def resolution_a_star(taquin: Taquin, limite_noeuds=100000, limite_temps=30,
                     heuristique='combinee') -> Optional[List[Tuple[str, Etat]]]:
     """
     Résout le Taquin par algorithme A* (A-Star).
-    Diffère du Best-First en ajoutant le coût du chemin parcouru à l'heuristique.
+    
+    L'algorithme A* combine BFS avec une heuristique. Il considère à la fois
+    le coût réel du chemin parcouru (g(n)) et l'estimation jusqu'au but (h(n)).
+    C'est un algorithme optimal si l'heuristique est admissible.
     
     Args:
         taquin: Instance du jeu de Taquin
@@ -1011,6 +1050,7 @@ def resolution_a_star(taquin: Taquin, limite_noeuds=100000, limite_temps=30,
                 h = heuristique_func(voisin)
                 
                 # Priorité totale f(n) = g(n) + h(n)
+                # C'est la différence principale avec Best-First qui n'utilise que h(n)
                 priorite = cout + h
                 compteur += 1
                 
