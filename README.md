@@ -1,36 +1,72 @@
 # Jeu de Taquin
 
-Ce projet implémente le jeu de Taquin en Python.
+Une implémentation complète du jeu de Taquin en Python, avec plusieurs algorithmes de résolution et heuristiques avancées.
+
+![Taquin](https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/15-puzzle.svg/220px-15-puzzle.svg.png)
+
+## Fonctionnalités principales
+
+- Implémentation unifiée dans un seul module (`taquin_complet.py`)
+- Quatre algorithmes de résolution : DFS, BFS, Best-First Search, A*
+- Sept heuristiques différentes pour les algorithmes informés
+- Analyse comparative des performances
+- 25 instances de test prédéfinies de différentes tailles (2x4, 3x3, 3x4, 4x4, 5x5)
 
 ## Installation
 
 1. Cloner le dépôt
-```
+```bash
 git clone [URL_DU_DEPOT]
 cd taquin
 ```
 
 2. Créer un environnement virtuel (recommandé)
-```
+```bash
 python -m venv venv
 venv\Scripts\activate  # Sur Windows
 source venv/bin/activate  # Sur Unix/MacOS
 ```
 
 3. Installer les dépendances
-```
-pip install -r requirements.txt
+```bash
+pip install numpy tabulate matplotlib
 ```
 
-## Utilisation
+## Utilisation rapide
 
-Pour charger et afficher une grille de Taquin à partir d'un fichier :
+Pour résoudre une instance de taquin prédéfinie avec l'algorithme A* :
+```bash
+python -m src.taquin_complet -i taquin_3x3b -a a-star -u combinee
 ```
-python src/main.py data/exemple.txt
+
+Pour comparer les performances des différentes heuristiques sur une instance :
+```bash
+python -m src.taquin_complet -i taquin_4x4 -c
 ```
+
+Pour analyser toutes les instances disponibles :
+```bash
+python analyse_toutes_instances.py
+```
+
+## Documentation complète
+
+Pour une documentation détaillée sur les algorithmes, les heuristiques, les analyses comparatives et les résultats obtenus, consultez le fichier [DOCUMENTATION.md](DOCUMENTATION.md).
 
 ## Structure du projet
 
-- `src/` : Code source du projet
-- `data/` : Fichiers de grilles de Taquin
-- `tests/` : Tests unitaires 
+- `src/taquin_complet.py` : Module principal contenant toutes les fonctionnalités
+- `data/taquin_instances.py` : Instances de test prédéfinies
+- `src/analyse_comparative.py` : Script d'analyse comparative des algorithmes
+- `analyse_toutes_instances.py` : Script pour tester toutes les instances
+- `DOCUMENTATION.md` : Documentation complète du projet
+
+## Résultats et performances
+
+Selon nos analyses :
+- L'algorithme A* avec l'heuristique combinée offre les meilleures performances
+- 64% des instances ont été résolues avec succès
+- Les instances 5x5 sont toutes résolubles, tandis que les instances 3x4 posent plus de difficultés
+- Le nombre d'étapes dans les solutions varie de 18 à 166 selon l'instance
+
+Pour plus de détails, consultez la section [Résultats obtenus](DOCUMENTATION.md#résultats-obtenus) dans la documentation. 

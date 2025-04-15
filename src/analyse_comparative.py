@@ -17,34 +17,18 @@ from typing import Dict, List, Tuple, Any, Optional
 # Ajouter le répertoire parent au chemin de recherche des modules
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-# ATTENTION: Le fichier taquin_complet.py doit être complété pour inclure
-# les algorithmes Best-First et A* ainsi que les différentes heuristiques
-# avant d'exécuter ce script d'analyse comparative.
-
 # Importer les fonctions depuis le fichier unique taquin_complet.py
 from src.taquin_complet import (
     Taquin, 
     resolution_dfs, 
-    resolution_bfs
-    # À décommenter une fois les fonctions implémentées dans taquin_complet.py:
-    # resolution_best_first, 
-    # resolution_a_star
-)
-
-# Le reste du code utilise encore les importations originales.
-# Il faudra adapter le code après avoir implémenté tous les algorithmes dans taquin_complet.py
-# Pour l'instant, on continue à utiliser les anciens imports pour les tests complets
-from src.taquin import Taquin as TaquinOriginal
-from src.recherche import (
-    resolution_dfs as dfs_original, 
-    resolution_bfs as bfs_original, 
+    resolution_bfs,
     resolution_best_first, 
     resolution_a_star
 )
 
 
 def mesurer_performances(
-    taquin: TaquinOriginal, 
+    taquin: Taquin, 
     algo_fonction, 
     algo_nom: str, 
     heuristique: Optional[str] = None,
@@ -136,7 +120,7 @@ def executer_tests_comparatifs(
         print(f"\nAnalyse de l'instance: {nom_instance}")
         
         # Charger l'instance
-        taquin = TaquinOriginal()
+        taquin = Taquin()
         if not taquin.charger_depuis_fichier(chemin_instance):
             print(f"Erreur lors du chargement de l'instance {nom_instance}")
             continue
@@ -482,11 +466,10 @@ def main():
         # Autres instances exclues car elles ont des problèmes de format
     ]
     
-    # Définir les algorithmes à tester
-    # Note: On utilise les fonctions originales tant que taquin_complet.py n'est pas complètement terminé
+    # Définir les algorithmes à tester en utilisant les fonctions du fichier unifié
     algorithmes = [
-        ("dfs", dfs_original),
-        ("bfs", bfs_original),
+        ("dfs", resolution_dfs),
+        ("bfs", resolution_bfs),
         ("best-first", resolution_best_first),
         ("a-star", resolution_a_star)
     ]
