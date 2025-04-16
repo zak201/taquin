@@ -59,15 +59,17 @@ Pour comparer les performances des deux heuristiques sur une instance :
 python -m src.taquin_complet -i taquin_4x4 -c
 ```
 
-Pour analyser toutes les instances disponibles :
+Pour comparer tous les algorithmes (DFS, BFS, Best-First, A*) sur plusieurs instances :
+```bash
+python generer_graphiques.py
+```
+Cette commande génère des tableaux comparatifs et des graphiques visuels.
+
+Pour analyser toutes les instances disponibles avec A* et l'heuristique combinée :
 ```bash
 python analyse_toutes_instances.py
 ```
 
-Pour générer des graphiques comparatifs des performances des algorithmes :
-```bash
-python generer_graphiques.py
-```
 Les graphiques seront sauvegardés dans le dossier `graphiques/` et incluent :
 - Temps d'exécution par algorithme
 - Nombre de nœuds explorés
@@ -85,6 +87,62 @@ Pour une documentation détaillée sur les algorithmes, les heuristiques, les an
 - `generer_graphiques.py` : Script pour générer des graphiques comparatifs
 - `analyse_toutes_instances.py` : Script pour tester toutes les instances
 - `DOCUMENTATION.md` : Documentation complète du projet
+
+## Comparaison des algorithmes
+
+Le projet implémente quatre algorithmes de recherche différents, chacun avec ses avantages et inconvénients :
+
+### BFS (Breadth-First Search / Recherche en largeur)
+- **Principe** : Explore l'arbre de recherche niveau par niveau.
+- **Garanties** : Trouve toujours la solution optimale (moins d'étapes).
+- **Points forts** : Optimalité garantie.
+- **Points faibles** : Consommation mémoire élevée, exploration exhaustive.
+- **Exemples de résultats** :
+  - Sur instance 3x3b : 21 étapes, 60785 nœuds explorés, 5.46s
+  - Ne parvient pas à résoudre les instances 4x4 et 5x5 complexes dans un temps raisonnable.
+
+### DFS (Depth-First Search / Recherche en profondeur)
+- **Principe** : Explore l'arbre de recherche en profondeur d'abord.
+- **Garanties** : Trouve une solution si elle existe (sans limite de profondeur).
+- **Points forts** : Faible consommation mémoire.
+- **Points faibles** : Solutions souvent très longues et non optimales.
+- **Exemples de résultats** :
+  - Sur instance 3x3b : 30993 étapes (!), 49794 nœuds explorés, 2s
+  - Sur instance 2x4b : 12154 étapes, 19920 nœuds explorés, 0.52s
+
+### Best-First Search (Recherche par le meilleur d'abord)
+- **Principe** : Explore les nœuds selon une heuristique estimant la proximité au but.
+- **Garanties** : Aucune garantie d'optimalité.
+- **Points forts** : Très rapide, explore peu de nœuds.
+- **Points faibles** : Peut trouver des solutions sous-optimales.
+- **Exemples de résultats** :
+  - Sur instance 3x3b (heuristique combinée) : 31 étapes, 54 nœuds explorés, 0.01s
+  - Sur instance 4x4 (heuristique combinée) : 70 étapes, 468 nœuds explorés, 0.15s
+
+### A* (A-Star)
+- **Principe** : Combine BFS avec une heuristique, considère à la fois le coût déjà parcouru et l'estimation jusqu'au but.
+- **Garanties** : Trouve la solution optimale si l'heuristique est admissible.
+- **Points forts** : Optimal et efficace, explore beaucoup moins de nœuds que BFS.
+- **Points faibles** : Peut être limité par la mémoire sur les instances très complexes.
+- **Exemples de résultats** :
+  - Sur instance 3x3b (heuristique combinée) : 21 étapes, 111 nœuds explorés, 0.02s
+  - Sur instance 4x4 (heuristique combinée) : 46 étapes, 837 nœuds explorés, 0.27s
+
+### Impact des heuristiques
+
+Les deux heuristiques implémentées ont des impacts différents :
+
+- **Heuristique linéaire** : 
+  - Améliore Manhattan en ajoutant une pénalité pour les conflits entre pièces
+  - Généralement performante sur les grilles de grande taille
+  - Ex. sur 4x4 avec A* : 30 étapes, 9784 nœuds, 2.42s
+
+- **Heuristique combinée** :
+  - Fusion optimisée de plusieurs métriques (Manhattan, cases mal placées, conflits)
+  - Généralement la plus efficace en nombre de nœuds explorés
+  - Ex. sur 4x4 avec A* : 46 étapes, 837 nœuds, 0.27s
+
+Pour des graphiques comparatifs détaillés, exécutez `python generer_graphiques.py` et consultez les résultats dans le dossier `graphiques/`.
 
 ## Résultats et performances
 
