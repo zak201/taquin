@@ -64,6 +64,16 @@ Pour analyser toutes les instances disponibles :
 python analyse_toutes_instances.py
 ```
 
+Pour générer des graphiques comparatifs des performances des algorithmes :
+```bash
+python generer_graphiques.py
+```
+Les graphiques seront sauvegardés dans le dossier `graphiques/` et incluent :
+- Temps d'exécution par algorithme
+- Nombre de nœuds explorés
+- Longueur des solutions
+- Efficacité (nœuds explorés par étape)
+
 ## Documentation complète
 
 Pour une documentation détaillée sur les algorithmes, les heuristiques, les analyses comparatives et les résultats obtenus, consultez le fichier [DOCUMENTATION.md](DOCUMENTATION.md).
@@ -72,7 +82,7 @@ Pour une documentation détaillée sur les algorithmes, les heuristiques, les an
 
 - `src/taquin_complet.py` : Module principal contenant toutes les fonctionnalités
 - `data/taquin_instances.py` : Instances de test prédéfinies
-- `src/analyse_comparative.py` : Script d'analyse comparative des algorithmes
+- `generer_graphiques.py` : Script pour générer des graphiques comparatifs
 - `analyse_toutes_instances.py` : Script pour tester toutes les instances
 - `DOCUMENTATION.md` : Documentation complète du projet
 
