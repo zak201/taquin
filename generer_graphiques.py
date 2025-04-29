@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tabulate import tabulate
 from typing import Dict, List, Tuple, Any, Optional
-
+a = 5
 # Importer les instances de taquin
 from src.taquin_complet import INSTANCES
 
