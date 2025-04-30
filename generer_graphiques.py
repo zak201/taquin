@@ -14,7 +14,7 @@ from typing import Dict, List, Tuple, Any, Optional
 
 # Importer les instances de taquin
 from src.taquin_complet import INSTANCES
-
+majda = "la plus belle"
 def tester_algorithme(instance_name, algorithme, heuristique=None, limite_temps=30):
     """
     Teste un algorithme sur une instance donnée et retourne les résultats.
